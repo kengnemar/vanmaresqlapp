@@ -2,30 +2,27 @@
 using vanmaresqlapp.Models;
 namespace vanmaresqlapp.Services
 {
-    public class ProductService
+    public class ProductService : IProductService
     {
-        private static string db_source = "vamarenappserver.database.windows.net";
-        private static string db_user = "sqladmin";
-        private static string db_password = "@2022!Year";
-        private static string db_database = "vanmaredb";
+        private readonly IConfiguration _configuration;
+
+        public ProductService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
 
         private SqlConnection GetConnection()
         {
-            var _builder = new SqlConnectionStringBuilder();
-            _builder.DataSource = db_source;
-            _builder.UserID = db_user;
-            _builder.Password = db_password;
-            _builder.InitialCatalog = db_database;
 
-            return new SqlConnection(_builder.ConnectionString);
+            return new SqlConnection(_configuration.GetConnectionString("SQLConnection"));
         }
         public List<Product> GetProducts()
-           {
+        {
             List<Product> _product_lst = new List<Product>();
             string _statement = "SELECT ProductID,ProductName,Quantity from Products";
 
             SqlConnection _connection = GetConnection();
-            
+
             _connection.Open();
 
             SqlCommand _sqlcommand = new SqlCommand(_statement, _connection);
